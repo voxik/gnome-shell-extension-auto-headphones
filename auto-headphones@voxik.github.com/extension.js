@@ -10,11 +10,11 @@ class Extension {
     constructor(meta) {
         this._meta = meta;
 
-        _log(`Initializing ${this._meta.name} version ${this._meta.version}`);
+        _log(`Initializing - Version ${this._meta.version}`);
     }
 
     enable() {
-        _log(`Enabling ${this._meta.name} version ${this._meta.version}`);
+        _log(`Enabling - Version ${this._meta.version}`);
 
         this._mixer_control = VolumeMenu.getMixerControl();
 
@@ -68,7 +68,7 @@ class Extension {
     }
 
     disable() {
-        _log(`Disabling ${this._meta.name} version ${this._meta.version}`);
+        _log(`Disabling - Version ${this._meta.version}`);
 
         if (this._handle_output_added_id) {
             this._mixer_control.disconnect(this._handle_output_added_id);
@@ -92,7 +92,7 @@ function init(extension) {
 }
 
 function _log(msg) {
-    log(msg);
+    log(`${Me.metadata.name}: ${msg}`);
 }
 
 function _dump(obj) {
