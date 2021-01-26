@@ -27,7 +27,7 @@ class Extension {
         _log('* handle: output-added');
 
         let mixer_ui_device = mixer_control.lookup_output_id(id);
-        _log(`(${id}) ${mixer_ui_device.port_name}: ${mixer_ui_device.description} (${mixer_ui_device.origin})`)
+        _log(`(${id}) ${mixer_ui_device.port_name}: ${mixer_ui_device.description} (${mixer_ui_device.origin})`);
 
         if (mixer_ui_device.port_name.includes('headphone')) {
             this._headphone_stream = mixer_control.get_stream_from_device(mixer_ui_device)
@@ -43,7 +43,7 @@ class Extension {
         _log('* handle: output-removed');
 
         let mixer_ui_device = mixer_control.lookup_output_id(id);
-        _log(`(${id}) ${mixer_ui_device.port_name}: ${mixer_ui_device.description} (${mixer_ui_device.origin})`)
+        _log(`(${id}) ${mixer_ui_device.port_name}: ${mixer_ui_device.description} (${mixer_ui_device.origin})`);
 
         if (mixer_control.get_default_sink() == this._headphone_stream) {
             this._headphone_stream = null;
