@@ -107,11 +107,11 @@ function _dump(obj) {
         try {
             propValue = obj[propName];
             if (`${propValue}`.search("function") < 0) {
-                _log(`${propName}: ${propValue}`);
+                _log(`  ${propName}: ${propValue}`);
             }
         }
         catch(e) {
-            _log(`${propName}: !!! ${e}`);
+            _log(`  ${propName}: !!! ${e}`);
         }
     }
     _log(`<<<`);
