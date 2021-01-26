@@ -102,6 +102,7 @@ function _log(msg) {
 }
 
 function _dump(obj) {
+    _log(`>>> dump`);
     var propValue;
     for (var propName in obj) {
         try {
@@ -111,4 +112,5 @@ function _dump(obj) {
         catch(e) { _log(`${propName}: !!!Error!!!`);
 	}
     }
+    _log(`<<<`);
 }
