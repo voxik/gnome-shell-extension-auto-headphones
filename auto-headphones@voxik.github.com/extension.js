@@ -109,8 +109,9 @@ function _dump(obj) {
             propValue = obj[propName];
             _log(`${propName}: ${propValue}`);
         }
-        catch(e) { _log(`${propName}: !!!Error!!!`);
-	}
+        catch(e) {
+            _log(`${propName}: !!! ${e}`);
+        }
     }
     _log(`<<<`);
 }
