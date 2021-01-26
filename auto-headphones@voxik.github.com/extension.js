@@ -1,19 +1,16 @@
 /* exported init */
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+var Me = null;
 
 const VolumeMenu = imports.ui.status.volume;
 
 class Extension {
     constructor(meta) {
-        this._meta = meta;
-
-        _log(`Initializing - Version ${this._meta.version}`);
+        _log(`Initializing - Version ${Me.metadata.version}`);
     }
 
     enable() {
-        _log(`Enabling - Version ${this._meta.version}`);
+        _log(`Enabling - Version ${Me.metadata.version}`);
 
         this._mixer_control = VolumeMenu.getMixerControl();
 
@@ -70,7 +67,7 @@ class Extension {
     }
 
     disable() {
-        _log(`Disabling - Version ${this._meta.version}`);
+        _log(`Disabling - Version ${Me.metadata.version}`);
 
         if (this._handle_output_added_id) {
             this._mixer_control.disconnect(this._handle_output_added_id);
@@ -90,6 +87,8 @@ class Extension {
 }
 
 function init(extension) {
+    Me = extension;
+
     return new Extension(extension.metadata);
 }
 
@@ -98,7 +97,7 @@ function _log_mixer_ui_device(mixer_ui_device) {
 }
 
 function _log(msg) {
-    log(`${Me.metadata.name}: ${msg}`);
+    log(`${Me && Me.metadata.name}: ${msg}`);
 }
 
 function _dump(obj) {
