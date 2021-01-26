@@ -55,6 +55,9 @@ class Extension {
     _handle_active_output_update(mixer_control, id) {
         _log('* handle: active-output-update');
 
+        let mixer_ui_device = mixer_control.lookup_output_id(id);
+        _log_mixer_ui_device(mixer_ui_device);
+
         let default_stream = mixer_control.get_default_sink();
 
         _log(`default_stream: ${default_stream}`);
