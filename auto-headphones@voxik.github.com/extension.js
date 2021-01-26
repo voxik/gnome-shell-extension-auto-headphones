@@ -106,7 +106,9 @@ function _dump(obj) {
     for (var propName in obj) {
         try {
             propValue = obj[propName];
-            _log(`${propName}: ${propValue}`);
+            if (`${propValue}`.search("function") < 0) {
+                _log(`${propName}: ${propValue}`);
+            }
         }
         catch(e) {
             _log(`${propName}: !!! ${e}`);
