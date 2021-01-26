@@ -4,7 +4,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const VolumeMenu = imports.ui.status.volume;
-const GLib = imports.gi.GLib;
 
 class Extension {
     constructor(meta) {
