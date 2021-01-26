@@ -100,15 +100,16 @@ function _log(msg) {
     log(`${Me && Me.metadata.name}: ${msg}`);
 }
 
-function _dump(obj) {
+function _dump(obj, options = {}) {
     _log(`>>> dump`);
     var propValue;
     for (var propName in obj) {
         try {
             propValue = obj[propName];
-            if (`${propValue}`.search("function") < 0) {
-                _log(`  ${propName}: ${propValue}`);
+            if ((`${propValue}`.search("function") >= 0) && !options.f) {
+                continue;
             }
+            _log(`  ${propName}: ${propValue}`);
         }
         catch(e) {
             _log(`  ${propName}: !!! ${e}`);
