@@ -83,7 +83,7 @@ class Extension {
     }
 }
 
-function init(extension, mixer_control = imports.ui.status.volume.getMixerControl()) {
+function init(extension = imports.misc.extensionUtils.getCurrentExtension(), mixer_control = imports.ui.status.volume.getMixerControl()) {
     Me = extension;
 
     return new Extension(mixer_control);
