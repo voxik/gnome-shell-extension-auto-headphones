@@ -23,6 +23,10 @@ class Extension {
         let mixer_ui_device = mixer_control.lookup_output_id(id);
         _log_mixer_ui_device(mixer_ui_device);
 
+        // Do nothing when there is not default sink, because mixer_control
+        // is probably not initialized yet.
+        if (!mixer_control.get_default_sink()) return;
+
         if (mixer_ui_device.port_name.includes('headphone')) {
             this._headphone_stream = mixer_control.get_stream_from_device(mixer_ui_device)
             _log(this._headphone_stream);
