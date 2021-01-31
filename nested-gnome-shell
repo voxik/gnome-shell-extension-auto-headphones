@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+# Run gnome-shell in nested wayland session. To load the current version of
+# extension, it is necessary to provide symlink to the extension directory in
+# ~/.local/share/gnome-shell/extensions/
+
+dbus-run-session -- gnome-shell --nested --wayland
