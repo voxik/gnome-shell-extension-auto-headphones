@@ -2,17 +2,15 @@
 
 var Me = null;
 
-const VolumeMenu = imports.ui.status.volume;
-
 class Extension {
-    constructor() {
+    constructor(mixer_control) {
         _log(`Initializing - Version ${Me.metadata.version}`);
+
+        this._mixer_control = mixer_control;
     }
 
     enable() {
         _log(`Enabling - Version ${Me.metadata.version}`);
-
-        this._mixer_control = VolumeMenu.getMixerControl();
 
         this._handle_output_added_id = this._mixer_control.connect('output-added', this._handle_output_added.bind(this));
         this._handle_output_removed_id = this._mixer_control.connect('output-removed', this._handle_output_removed.bind(this));
@@ -82,15 +80,13 @@ class Extension {
             this._mixer_control.disconnect(this._handle_active_output_update_id)
             this._handle_active_output_update_id = null;
         }
-
-        this._mixer_control = null;
     }
 }
 
-function init(extension) {
+function init(extension, mixer_control = imports.ui.status.volume.getMixerControl()) {
     Me = extension;
 
-    return new Extension();
+    return new Extension(mixer_control);
 }
 
 function _log_mixer_ui_device(mixer_ui_device) {
