@@ -33,6 +33,10 @@ class Extension {
 
             _log("! change_output: (" + id + ") " + mixer_ui_device.origin + " " + mixer_ui_device.description);
             this._original_stream = mixer_control.get_default_sink();
+
+            // It could be tempting to use mixer_control.change_output()
+            // instead, but unfortunately this triggers `active-output-update`
+            // and therefore resets the state.
             mixer_control.set_default_sink(this._headphone_stream);
         }
     }
