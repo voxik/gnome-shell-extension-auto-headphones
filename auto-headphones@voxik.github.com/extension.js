@@ -5,7 +5,7 @@ var Me = null;
 const VolumeMenu = imports.ui.status.volume;
 
 class Extension {
-    constructor(meta) {
+    constructor() {
         _log(`Initializing - Version ${Me.metadata.version}`);
     }
 
@@ -90,7 +90,7 @@ class Extension {
 function init(extension) {
     Me = extension;
 
-    return new Extension(extension.metadata);
+    return new Extension();
 }
 
 function _log_mixer_ui_device(mixer_ui_device) {
