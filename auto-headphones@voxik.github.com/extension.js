@@ -42,8 +42,9 @@ class Extension {
         _log_mixer_ui_device(mixer_ui_device);
 
         if (mixer_control.get_default_sink() == this._headphone_stream) {
-            this._headphone_stream = null;
             mixer_control.set_default_sink(this._original_stream);
+            this._headphone_stream = null;
+            this._original_stream = null;
         }
 
     }
