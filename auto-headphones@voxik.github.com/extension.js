@@ -106,7 +106,7 @@ function _log(msg) {
 }
 
 function _dump(obj, options = {}) {
-    _log(`>>> dump`);
+    _log(`>>> dump: ${obj ? obj.constructor.name : "null"}`);
     var propValue;
     for (var propName in obj) {
         try {
