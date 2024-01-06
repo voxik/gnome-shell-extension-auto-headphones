@@ -3,7 +3,7 @@
   "description": "Switch output to headphones on connect",
   "uuid": "auto-headphones@voxik.github.com",
   "shell-version": [
-    "3.38"
+    "3.38", "40"
   ],
   "version": 1
 }

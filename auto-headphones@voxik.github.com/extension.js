@@ -1,5 +1,7 @@
 /* exported init */
 
+const Gvc = imports.gi.Gvc;
+
 var Me = null;
 
 class Extension {
@@ -14,62 +16,82 @@ class Extension {
 
         this._handle_output_added_id = this._mixer_control.connect('output-added', this._handle_output_added.bind(this));
         this._handle_output_removed_id = this._mixer_control.connect('output-removed', this._handle_output_removed.bind(this));
-        this._handle_active_output_update_id = this._mixer_control.connect('active-output-update', this._handle_active_output_update.bind(this));
+
+        this._handle_default_sink_changed_id = this._mixer_control.connect('default-sink-changed', this._handle_default_sink_changed.bind(this));
+    }
+
+    _handle_default_sink_changed(mixer_control, id) {
+        let mixer_stream = mixer_control.lookup_stream_id(id);
+
+        // Only Sinks are of interest.
+        if (!(mixer_stream instanceof Gvc.MixerSink)) return;
+
+        _log(`* handle: default-sink-changed (${id})`);
+        _log_mixer_stream(mixer_stream);
+
+        if (this._original_sink && !mixer_stream.port.includes('headphone')) {
+            _log("! External sink change");
+
+            this._original_sink = null;
+        }
+    }
+
+    _handle_stream_changed(mixer_control, id) {
+        let mixer_stream = mixer_control.lookup_stream_id(id);
+
+        // Only Sinks are of interest.
+        if (!(mixer_stream instanceof Gvc.MixerSink)) return;
+
+        _log(`* handle: stream-changed (${id})`);
+
+        let default_sink = mixer_control.get_default_sink();
+
+        if (mixer_stream != default_sink) {
+            if (mixer_stream.port.includes('headphone')) {
+                _log("! Headphones plugged in");
+
+                if (this._handle_stream_changed_id) {
+                    mixer_control.disconnect(this._handle_stream_changed_id);
+                    this._handle_stream_changed_id = null;
+                }
+
+                this._original_sink = default_sink;
+
+                mixer_control.set_default_sink(mixer_stream);
+            }
+        }
     }
 
     _handle_output_added(mixer_control, id) {
-        _log('* handle: output-added');
+        _log(`* handle: output-added (${id})`);
 
         let mixer_ui_device = mixer_control.lookup_output_id(id);
         _log_mixer_ui_device(mixer_ui_device);
 
-        // Do nothing when there is not default sink, because mixer_control
-        // is probably not initialized yet.
-        if (!mixer_control.get_default_sink()) return;
-
         if (mixer_ui_device.port_name.includes('headphone')) {
-            this._headphone_stream = mixer_control.get_stream_from_device(mixer_ui_device)
-            _log(this._headphone_stream);
+            _log("! Headphones output added");
 
-            _log("! change_output: (" + id + ") " + mixer_ui_device.origin + " " + mixer_ui_device.description);
-            this._original_stream = mixer_control.get_default_sink();
-
-            // It could be tempting to use mixer_control.change_output()
-            // instead, but unfortunately this triggers `active-output-update`
-            // and therefore resets the state.
-            mixer_control.set_default_sink(this._headphone_stream);
+            // Stream might not be available yet, so wait for it.
+            this._handle_stream_changed_id = this._mixer_control.connect('stream-changed', this._handle_stream_changed.bind(this));
         }
     }
 
     _handle_output_removed(mixer_control, id) {
-        _log('* handle: output-removed');
+        _log(`* handle: output-removed (${id})`);
 
         let mixer_ui_device = mixer_control.lookup_output_id(id);
         _log_mixer_ui_device(mixer_ui_device);
 
-        if (mixer_control.get_default_sink() == this._headphone_stream) {
-            mixer_control.set_default_sink(this._original_stream);
-            this._headphone_stream = null;
-            this._original_stream = null;
-        }
+        if (this._original_sink && mixer_ui_device.port_name.includes('headphone')) {
+            _log("! Headphone unplugged");
 
-    }
+            // `set_default_sink` internaly reuse just `_original_sink.name`
+            // therefore this should be safe call even if the
+            // `_original_sink` is not valid anymore due to unplugged audio
+            // device.
+            mixer_control.set_default_sink(this._original_sink);
 
-    _handle_active_output_update(mixer_control, id) {
-        _log('* handle: active-output-update');
-
-        let mixer_ui_device = mixer_control.lookup_output_id(id);
-        _log_mixer_ui_device(mixer_ui_device);
-
-        let default_stream = mixer_control.get_default_sink();
-
-        _log(`default_stream: ${default_stream}`);
-        _log(`original_stream: ${this._original_stream}`);
-        _log(`headphone_stream: ${this._headphone_stream}`);
-
-        if (default_stream != this._headphone_stream) {
-            this._original_stream = null;
-            this._headphone_stream = null;
+            this._original_sink = null;
         }
     }
 
@@ -84,9 +106,13 @@ class Extension {
             this._mixer_control.disconnect(this._handle_output_removed_id);
             this._handle_output_removed_id = null;
         }
-        if (this._handle_active_output_update_id) {
-            this._mixer_control.disconnect(this._handle_active_output_update_id)
-            this._handle_active_output_update_id = null;
+        if (this._handle_stream_changed_id) {
+            this._mixer_control.disconnect(this._handle_stream_changed_id);
+            this._handle_stream_changed_id = null;
+        }
+        if (this._handle_default_sink_changed_id) {
+            this._mixer_control.disconnect(this._handle_default_sink_changed_id);
+            this._handle_default_sink_changed_id = null;
         }
     }
 }
@@ -95,6 +121,16 @@ function init(extension = imports.misc.extensionUtils.getCurrentExtension(), mix
     Me = extension;
 
     return new Extension(mixer_control);
+}
+
+function _log_mixer_stream(mixer_stream) {
+    if (mixer_stream) {
+        _log(`(${mixer_stream.id}) ${mixer_stream.port}: ${mixer_stream.description} (${mixer_stream.name})`);
+    }
+    else
+    {
+        _log("null mixer_stream");
+    }
 }
 
 function _log_mixer_ui_device(mixer_ui_device) {
