@@ -1,14 +1,19 @@
-/* exported init */
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const Gvc = imports.gi.Gvc;
+import {getMixerControl} from 'resource:///org/gnome/shell/ui/status/volume.js';
+import Gvc from 'gi://Gvc';
 
 var Me = null;
 
-class Extension {
-    constructor(mixer_control) {
+export default class AutoHeadphones extends Extension {
+    constructor(metadata) {
+	super(metadata);
+
+	Me = this
+
         _log(`Initializing - Version ${Me.metadata.version}`);
 
-        this._mixer_control = mixer_control;
+        this._mixer_control = getMixerControl()
     }
 
     enable() {
@@ -115,12 +120,6 @@ class Extension {
             this._handle_default_sink_changed_id = null;
         }
     }
-}
-
-function init(extension = imports.misc.extensionUtils.getCurrentExtension(), mixer_control = imports.ui.status.volume.getMixerControl()) {
-    Me = extension;
-
-    return new Extension(mixer_control);
 }
 
 function _log_mixer_stream(mixer_stream) {
