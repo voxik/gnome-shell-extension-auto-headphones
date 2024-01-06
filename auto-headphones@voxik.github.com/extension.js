@@ -34,7 +34,7 @@ export default class AutoHeadphones extends Extension {
         _log(`* handle: default-sink-changed (${id})`);
         _log_mixer_stream(mixer_stream);
 
-        if (this._original_sink && !mixer_stream.port.includes('headphone')) {
+        if (this._original_sink && !(mixer_stream.port.includes('headphone') || mixer_stream.port.includes('headphone'))) {
             _log("! External sink change");
 
             this._original_sink = null;
@@ -52,7 +52,7 @@ export default class AutoHeadphones extends Extension {
         let default_sink = mixer_control.get_default_sink();
 
         if (mixer_stream != default_sink) {
-            if (mixer_stream.port.includes('headphone')) {
+            if (mixer_stream.port.includes('headphone') || mixer_stream.port.includes('headset')) {
                 _log("! Headphones plugged in");
 
                 if (this._handle_stream_changed_id) {
@@ -73,7 +73,7 @@ export default class AutoHeadphones extends Extension {
         let mixer_ui_device = mixer_control.lookup_output_id(id);
         _log_mixer_ui_device(mixer_ui_device);
 
-        if (mixer_ui_device.port_name.includes('headphone')) {
+        if (mixer_ui_device.port_name.includes('headphone') || mixer_ui_device.port_name.includes('headset')) {
             _log("! Headphones output added");
 
             // Stream might not be available yet, so wait for it.
@@ -87,7 +87,7 @@ export default class AutoHeadphones extends Extension {
         let mixer_ui_device = mixer_control.lookup_output_id(id);
         _log_mixer_ui_device(mixer_ui_device);
 
-        if (this._original_sink && mixer_ui_device.port_name.includes('headphone')) {
+        if (this._original_sink && (mixer_ui_device.port_name.includes('headphone') || mixer_ui_device.port_name.includes('headset'))) {
             _log("! Headphone unplugged");
 
             // `set_default_sink` internaly reuse just `_original_sink.name`
